@@ -5,11 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    
+    <!-- Put the meta of Content-Security-Policy disabling inline javascript code-->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' ;"> -->
     <title>XSS</title>
 
     <link rel="stylesheet" type="text/css" href="vendors/bootstrap.min.css">
     <script type="text/javascript" src="vendors/purify.min.js"></script>
+    
 </head>
 
 <body style="background-image: url(img/united-squares.png); color: #ffffff;">
@@ -92,8 +94,10 @@
         userParam = params.get("name");
         userName = "applicant";
 
+        // ==> Fixation of XSS vulnerability #1
+
         if (userParam !== null) {
-            userName = userParam;
+            userName =  encodeURIComponent(userParam);
         }
 
         document.getElementById("welcome-text").innerHTML = "<h1>How do you do, " + userName + "?</h1>";
@@ -105,6 +109,7 @@
 
         input.addEventListener("input", updateValue);
 
+        // ==> Fixation of XSS vulnerability #2
         function updateValue(e) {
             log.innerHTML = e.target.value;
         }
@@ -117,15 +122,18 @@
 
         showButton.addEventListener("click", showHTML);
 
+        // ==> Fixation of XSS vulnerability #3
         function showHTML() {
-            htmlOutput.innerHTML = htmlInput.value;
+            htmlOutput.innerText = htmlInput.value;
         }
 
         //  XSS vulnerability #4
 
         const redir = params.get("goto");
+
+        // ==> Fixation of XSS vulnerability #4
         if (redir !== null && redir !== "null") {
-            document.location = redir;
+            document.location = encodeURIComponent(redir);
         }
 
     </script>
